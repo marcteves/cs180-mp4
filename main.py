@@ -16,6 +16,12 @@ start = time.time()
 def flat_greyscale_read(filename):
     return cv2.imread(filename, cv2.IMREAD_GRAYSCALE).flatten()
 
+# both must be ndarray
+def get_accuracy(prediction, actual):
+    accuracy = sum(1 for x,y in zip(actual, prediction) if x == y)
+    accuracy = accuracy / len(actual)
+    return accuracy
+
 parser = argparse.ArgumentParser(description="""Takes four files as input,
         returns a vector classifying the test set""")
 parser.add_argument("train_set")
@@ -119,3 +125,8 @@ for i in np.arange(0.1, 1.1, 0.1):
     print("Fit done in %f" % (end - start))
 
 # now use those classifiers we made
+#1
+prediction = mlp_1.predict(test_vector)
+accuracy = compute_accuracy(predict, test_tags)
+print("Accuracy for #1 (test) %f" % accuracy)
+
