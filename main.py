@@ -148,8 +148,8 @@ for i in np.arange(0.1, 1.1, 0.1):
 # make graphs
 # graph for #2
 
-x_values_mlp = np.ndarray(x_values_mlp)
-y_values_mlp = np.ndarray(y_values_mlp)
+x_values_mlp = np.array(x_values_mlp)
+y_values_mlp = np.array(y_values_mlp)
 
 trace_2 = go.Scatter(
         x = x_values_mlp,
@@ -175,8 +175,8 @@ plt.plot(figure_2, filename='figure_2.html')
 
 # graph for #5
 
-x_values_svm = np.ndarray(x_values_svm)
-y_values_svm = np.ndarray(y_values_svm)
+x_values_svm = np.array(x_values_svm)
+y_values_svm = np.array(y_values_svm)
 
 trace_5 = go.Scatter(
         x = x_values_svm,
@@ -199,10 +199,11 @@ layout_5 = go.Layout(
 
 figure_5 = go.Figure(data = [trace_5], layout = layout_5)
 plt.plot(figure_5, filename='figure_5.html')
+
 # graph for #6
 
-x_values_svmg = np.ndarray(x_values_svmg)
-y_values_svmg = np.ndarray(y_values_svmg)
+x_values_svmg = np.array(x_values_svmg)
+y_values_svmg = np.array(y_values_svmg)
 
 trace_6 = go.Scatter(
         x = x_values_svmg,
