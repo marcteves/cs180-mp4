@@ -16,13 +16,6 @@ start = time.time()
 def flat_greyscale_read(filename):
     return cv2.imread(filename, cv2.IMREAD_GRAYSCALE).flatten()
 
-# both must be ndarray
-def get_accuracy(prediction, actual):
-    accuracy = sum(1 for x,y in zip(actual, prediction) if x == y)
-    print(accuracy)
-    accuracy = accuracy / len(actual)
-    return accuracy
-
 parser = argparse.ArgumentParser(description="""Takes four files as input,
         returns a vector classifying the test set""")
 parser.add_argument("train_set")
@@ -52,14 +45,16 @@ for line in test_tags_file.read().splitlines():
     test_tags.append(int(line))
 test_tags = np.array(test_tags)
 
-# create test and training vectors
+# create and standardize test and training vectors
 for line in train_list.read().splitlines():
     train_vector.append(flat_greyscale_read(line))
 train_vector = np.array(train_vector)
+train_vector = StandardScaler().fit_transform(train_vector)
 
 for line in test_list.read().splitlines():
     test_vector.append(flat_greyscale_read(line))
 test_vector = np.array(test_vector)
+test_vector = StandardScaler().fit_transform(test_vector)
 
 features_size = train_vector.shape[1]
 
@@ -67,67 +62,82 @@ end = time.time()
 
 print("Preprocessing done in %f" % (end - start))
 
-# create classifier for #1
-mlp_1 = MLPClassifier(hidden_layer_sizes = (int(features_size / 2)),
+# create and evaluate classifier for #1
+mlp = MLPClassifier(hidden_layer_sizes = (int(features_size / 2)),
         solver='sgd')
 start = time.time()
-mlp_1.fit(train_vector, train_tags)
+mlp.fit(train_vector, train_tags)
 end = time.time()
 print("Fit #1 done in %f" % (end - start))
+accuracy = mlp.score(test_vector, test_tags)
+print("Accuracy %f" % accuracy)
 
-# create classifier for #2
-mlp_2 = MLPClassifier(hidden_layer_sizes = (features_size),
-        solver='sgd')
-start = time.time()
-mlp_2.fit(train_vector, train_tags)
-end = time.time()
-print("Fit #2 done in %f" % (end - start))
+starting_size = features_size / 2
+
+# store x and y values to graph later
+x_values_mlp = []
+y_values_mlp = []
+
+# create and evaluate classifiers for #2
+for num_neurons in np.linspace(starting_size, features_size, num=5):
+    mlp = MLPClassifier(hidden_layer_sizes = (int(num_neurons)),
+            solver='sgd')
+    x_values_mlp.append(int(num_neurons))
+    start = time.time()
+    mlp.fit(train_vector, train_tags)
+    end = time.time()
+    print("Fit #2 done in %f" % (end - start))
+    accuracy = mlp.score(test_vector, test_tags)
+    y_values_mlp.append(accuracy)
+    print("Accuracy %f" % accuracy)
 
 # Reduce test and train vectors to ten dimensions (PCA #3)
 # Standardize so that PCA doesn't get confused, then apply PCA
 # keep top 10 principal components
 pca = PCA(n_components = 10)
-reduced_train_vector = pca.fit_transform(
-        StandardScaler().fit_transform(train_vector))
-reduced_test_vector = pca.fit_transform(
-        StandardScaler().fit_transform(test_vector))
-mlp_3 = MLPClassifier(hidden_layer_sizes = (int(features_size / 2)),
+reduced_train_vector = pca.fit_transform(train_vector)
+reduced_test_vector = pca.fit_transform(test_vector)
+mlp = MLPClassifier(hidden_layer_sizes = (int(features_size / 2)),
         solver='sgd')
 start = time.time()
-mlp_3.fit(reduced_train_vector, train_tags)
+mlp.fit(reduced_train_vector, train_tags)
 end = time.time()
 print("Fit #3 done in %f" % (end - start))
+accuracy = mlp.score(reduced_test_vector, test_tags)
+print("Accuracy %f" % accuracy)
 
 # create classifier for #4
-svm_1 = SVC()
+svm = SVC()
 start = time.time()
-svm_1.fit(train_vector, train_tags)
+svm.fit(train_vector, train_tags)
 end = time.time()
 print("Fit #4 done in %f" % (end - start))
+accuracy = svm.score(test_vector, test_tags)
+print("Accuracy %f" % accuracy)
 
+x_values_svm = []
+y_values_svm = []
 # create classifiers for #5
-svm_2 = []
-
 for i in range(1,6):
+    x_values_svm.append(i)
     start = time.time()
-    classifier = SVC(degree=i)
-    svm_2.append(classifier)
+    svm = SVC(degree=i)
     end = time.time()
-    print("Fit #%d done in %f" % (4 + i, end - start))
+    print("Fit #5 done in %f" % (end - start))
+    accuracy = svm.score(test_vector, test_tags)
+    y_values_svm.append(accuracy)
+    print("Accuracy %f" % accuracy)
 
-# create classifiers for #6
-svm_3 = []
+x_values_svmg = []
+y_values_svmg = []
 
 for i in np.arange(0.1, 1.1, 0.1):
+    x_values_svmg.append(i)
     start = time.time()
-    classifier = SVC(gamma=i)
-    svm_3.append(classifier)
+    svm = SVC(gamma=i)
     end = time.time()
     print("Fit done in %f" % (end - start))
-
-# now use those classifiers we made
-#1
-prediction = mlp_1.predict(test_vector)
-accuracy = get_accuracy(prediction, test_tags)
-print("Accuracy for #1 (test) %f" % accuracy)
+    accuracy = svm.score(test_vector, test_tags)
+    y_values_svmg.append(accuracy)
+    print("Accuracy %f" % accuracy)
 
