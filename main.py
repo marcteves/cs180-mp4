@@ -1,11 +1,12 @@
 #! /usr/bin/python3
 
 import os
-import sys
 import argparse
 import numpy as np
 import time
 import cv2
+import plotly.offline as plt
+import plotly.graph_objs as go
 from sklearn.neural_network import MLPClassifier 
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
@@ -118,6 +119,7 @@ print("Accuracy %f" % accuracy)
 x_values_svm = []
 y_values_svm = []
 # create classifiers for #5
+
 for i in range(1,6):
     x_values_svm.append(i)
     start = time.time()
@@ -130,6 +132,7 @@ for i in range(1,6):
 
 x_values_svmg = []
 y_values_svmg = []
+# create classifiers for #5
 
 for i in np.arange(0.1, 1.1, 0.1):
     x_values_svmg.append(i)
@@ -141,3 +144,84 @@ for i in np.arange(0.1, 1.1, 0.1):
     y_values_svmg.append(accuracy)
     print("Accuracy %f" % accuracy)
 
+
+# make graphs
+# graph for #2
+
+x_values_mlp = np.ndarray(x_values_mlp)
+y_values_mlp = np.ndarray(y_values_mlp)
+
+trace_2 = go.Scatter(
+        x = x_values_mlp,
+        y = y_values_mlp,
+        mode = 'lines+markers',
+        line = dict(
+            shape = "spline"
+            )
+        )
+
+layout_2 = go.Layout(
+        title = 'Accuracy graph',
+        xaxis = dict(
+            title = '# of nodes in hidden layer',
+            ),
+        yaxis = dict(
+            title = 'accuracy',
+            ),
+        )
+
+figure_2 = go.Figure(data = [trace_2], layout = layout_2)
+plt.plot(figure_2, filename='figure_2.html')
+
+# graph for #5
+
+x_values_svm = np.ndarray(x_values_svm)
+y_values_svm = np.ndarray(y_values_svm)
+
+trace_5 = go.Scatter(
+        x = x_values_svm,
+        y = y_values_svm,
+        mode = 'lines+markers',
+        line = dict(
+            shape = "spline"
+            )
+        )
+
+layout_5 = go.Layout(
+        title = 'Accuracy graph',
+        xaxis = dict(
+            title = 'degree of polynomial',
+            ),
+        yaxis = dict(
+            title = 'accuracy',
+            ),
+        )
+
+figure_5 = go.Figure(data = [trace_5], layout = layout_5)
+plt.plot(figure_5, filename='figure_5.html')
+# graph for #6
+
+x_values_svmg = np.ndarray(x_values_svmg)
+y_values_svmg = np.ndarray(y_values_svmg)
+
+trace_6 = go.Scatter(
+        x = x_values_svmg,
+        y = y_values_svmg,
+        mode = 'lines+markers',
+        line = dict(
+            shape = "spline"
+            )
+        )
+
+layout_6 = go.Layout(
+        title = 'Accuracy graph',
+        xaxis = dict(
+            title = 'gamma value',
+            ),
+        yaxis = dict(
+            title = 'accuracy',
+            ),
+        )
+
+figure_6 = go.Figure(data = [trace_6], layout = layout_6)
+plt.plot(figure_6, filename='figure_6.html')
