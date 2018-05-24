@@ -19,6 +19,7 @@ def flat_greyscale_read(filename):
 # both must be ndarray
 def get_accuracy(prediction, actual):
     accuracy = sum(1 for x,y in zip(actual, prediction) if x == y)
+    print(accuracy)
     accuracy = accuracy / len(actual)
     return accuracy
 
@@ -67,7 +68,7 @@ end = time.time()
 print("Preprocessing done in %f" % (end - start))
 
 # create classifier for #1
-mlp_1 = MLPClassifier(hidden_layer_sizes = (1, int(features_size / 2)),
+mlp_1 = MLPClassifier(hidden_layer_sizes = (int(features_size / 2)),
         solver='sgd')
 start = time.time()
 mlp_1.fit(train_vector, train_tags)
@@ -75,7 +76,7 @@ end = time.time()
 print("Fit #1 done in %f" % (end - start))
 
 # create classifier for #2
-mlp_2 = MLPClassifier(hidden_layer_sizes = (1, features_size),
+mlp_2 = MLPClassifier(hidden_layer_sizes = (features_size),
         solver='sgd')
 start = time.time()
 mlp_2.fit(train_vector, train_tags)
@@ -90,7 +91,7 @@ reduced_train_vector = pca.fit_transform(
         StandardScaler().fit_transform(train_vector))
 reduced_test_vector = pca.fit_transform(
         StandardScaler().fit_transform(test_vector))
-mlp_3 = MLPClassifier(hidden_layer_sizes = (1, int(features_size / 2)),
+mlp_3 = MLPClassifier(hidden_layer_sizes = (int(features_size / 2)),
         solver='sgd')
 start = time.time()
 mlp_3.fit(reduced_train_vector, train_tags)
@@ -127,6 +128,6 @@ for i in np.arange(0.1, 1.1, 0.1):
 # now use those classifiers we made
 #1
 prediction = mlp_1.predict(test_vector)
-accuracy = compute_accuracy(predict, test_tags)
+accuracy = get_accuracy(prediction, test_tags)
 print("Accuracy for #1 (test) %f" % accuracy)
 
