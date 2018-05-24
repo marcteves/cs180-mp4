@@ -4,8 +4,14 @@ import os
 import sys
 import argparse
 import numpy as np
+import time
 import cv2
 from sklearn.neural_network import MLPClassifier 
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.svm import SVC
+
+start = time.time()
 
 def flat_greyscale_read(filename):
     return cv2.imread(filename, cv2.IMREAD_GRAYSCALE).flatten()
@@ -50,11 +56,66 @@ test_vector = np.array(test_vector)
 
 features_size = train_vector.shape[1]
 
+end = time.time()
+
+print("Preprocessing done in %f" % (end - start))
+
+# create classifier for #1
 mlp_1 = MLPClassifier(hidden_layer_sizes = (1, int(features_size / 2)),
         solver='lbfgs')
+start = time.time()
 mlp_1.fit(train_vector, train_tags)
+end = time.time()
+print("Fit #1 done in %f" % (end - start))
 
-
+# create classifier for #2
 mlp_2 = MLPClassifier(hidden_layer_sizes = (1, features_size),
         solver='lbfgs')
+start = time.time()
 mlp_2.fit(train_vector, train_tags)
+end = time.time()
+print("Fit #2 done in %f" % (end - start))
+
+# Reduce test and train vectors to ten dimensions (PCA #3)
+# Standardize so that PCA doesn't get confused, then apply PCA
+# keep top 10 principal components
+pca = PCA(n_components = 10)
+reduced_train_vector = pca.fit_transform(
+        StandardScaler().fit_transform(train_vector))
+reduced_test_vector = pca.fit_transform(
+        StandardScaler().fit_transform(test_vector))
+mlp_3 = MLPClassifier(hidden_layer_sizes = (1, int(features_size / 2)),
+        solver='sgd')
+start = time.time()
+mlp_3.fit(reduced_train_vector, train_tags)
+end = time.time()
+print("Fit #3 done in %f" % (end - start))
+
+# create classifier for #4
+svm_1 = SVC()
+start = time.time()
+svm_1.fit(train_vector, train_tags)
+end = time.time()
+print("Fit #4 done in %f" % (end - start))
+
+# create classifiers for #5
+svm_2 = []
+
+for i in range(1,6):
+    start = time.time()
+    classifier = SVC(degree=i)
+    svm_2.append(classifier)
+    end = time.time()
+    print("Fit #%d done in %f" % (4 + i, end - start))
+
+# create classifiers for #6
+svm_3 = []
+
+for i in np.arange(0.1, 1.1, 0.1):
+    start = time.time()
+    classifier = SVC(gamma=i)
+    svm_3.append(classifier)
+    end = time.time()
+    print("Fit done in %f" % (end - start))
+
+# now use those classifiers we made
