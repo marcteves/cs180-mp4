@@ -62,7 +62,7 @@ print("Preprocessing done in %f" % (end - start))
 
 # create classifier for #1
 mlp_1 = MLPClassifier(hidden_layer_sizes = (1, int(features_size / 2)),
-        solver='lbfgs')
+        solver='sgd')
 start = time.time()
 mlp_1.fit(train_vector, train_tags)
 end = time.time()
@@ -70,7 +70,7 @@ print("Fit #1 done in %f" % (end - start))
 
 # create classifier for #2
 mlp_2 = MLPClassifier(hidden_layer_sizes = (1, features_size),
-        solver='lbfgs')
+        solver='sgd')
 start = time.time()
 mlp_2.fit(train_vector, train_tags)
 end = time.time()
