@@ -1,0 +1,73 @@
+\documentclass{article}
+\usepackage{graphicx}
+	\setkeys{Gin}{width=1.0\textwidth}
+\usepackage[a4paper]{geometry}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\definecolor{sexygray}{HTML}{1F1F1F}
+\begin{document}
+	\title{CS 180 MP 4: Artificial Neural Networks and Support Vector Machines}
+	\author{Marc Teves\\ 2015-08007\\ THR}
+	\maketitle
+
+	Requirements:
+	\begin{itemize}
+		\item Python 3
+		\item \texttt{numpy} python module
+		\item \texttt{scikit-learn} python module
+		\item \texttt{opencv} python module
+		\item \texttt{bash} or your favorite shell
+		\item \texttt{plotly} if you want to generate the graphs
+	\end{itemize}
+
+	Download \texttt{http://www.cl.cam.ac.uk/Research/DTG/attarchive/pub/data/att\_faces.zip}.
+
+	Extract the \texttt{orl\_faces} folder to the project directory. Remove 
+	\texttt{orl\_faces/README}. 
+
+	Just run \texttt{main.py train\_list train\_tags test\_list test\_tags} or
+	\texttt{start\_script.sh} to save on typing.
+
+	\begin{enumerate}
+		\item 
+			The MLP classifier with half the number of the input nodes in the hidden layer was 94.3750\% accurate on the testing set.
+		\item 
+			Refer to Figure~1.
+			In general, the MLP performs better with more nodes in the hidden layer.
+			It achieves a maximum accuracy at around 8k nodes.
+		\item 
+			The MLP performed way worse (5\% accuracy), but it trained faster.
+		\item
+			The SVM trained really quickly, and had 95.6250\% accuracy on the test set.
+		\item 
+			Refer to Figure~2.
+			The performance of the SVM did not change and it completed training at around the same time.
+		\item
+			Refer to Figure~3.
+			The accuracy suffered rapidly as the gamma increased.
+		\item
+			The SVM trained much, much faster than the MLP and seemed to require less memory.
+			The MLP was able to achieve a higher accuracy than the SVM, by finding the optimal number of nodes in the hidden layer.
+	\end{enumerate}
+
+	\begin{figure}[h]
+		\centering
+		\includegraphics{fig_1.png}
+		\caption{Accuracy for regular dictionary extracted from the training
+		set}
+	\end{figure}
+	\begin{figure}[h]
+		\centering
+		\includegraphics{fig_2.png}
+		\caption{Plot of accuracy vs. lambda values. Accuracy decreases 
+		exponentially slower with higher lambda values.}
+	\end{figure}
+	\begin{figure}[h]
+		\centering
+		\includegraphics{fig_3.png}
+		\caption{Accuracy for regular dictionary extracted from the training
+		set, with stop words and very small words removed}
+	\end{figure}
+
+\end{document}
